@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#111219">
+<title>Deadlock Text Workshop</title>
+<style>
+:root{color-scheme:dark;--bg:#101116;--panel:#191b23;--panel2:#20232d;--line:#343846;--text:#f0f1f5;--muted:#a5a9b8;--accent:#a78bfa;--accent2:#7c3aed;--good:#7dd3a7;--warn:#f5c56b;--bad:#ff9a9a}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#1d1b2b 0,#101116 55%);color:var(--text);font:14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+header{padding:20px clamp(14px,3vw,36px);border-bottom:1px solid var(--line);background:#111219eF;position:sticky;top:0;z-index:5;backdrop-filter:blur(14px)}
+.brand{display:flex;align-items:center;gap:12px}.logo{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#c4b5fd,#6d28d9);display:grid;place-items:center;color:#15121f;font-weight:900;font-size:20px}.brand h1{font-size:20px;margin:0}.brand p{margin:3px 0 0;color:var(--muted);font-size:12px}
+main{max-width:1600px;margin:auto;padding:20px clamp(10px,2.5vw,30px) 48px}.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+button,.filebutton{border:1px solid var(--line);background:var(--panel2);color:var(--text);padding:9px 12px;border-radius:9px;cursor:pointer;font:inherit;display:inline-flex;align-items:center;justify-content:center;gap:7px}
+button:hover,.filebutton:hover{border-color:#8b78d5;background:#29263a}button.primary{background:var(--accent2);border-color:var(--accent2)}button.primary:hover{background:#6d28d9}button:disabled{opacity:.42;cursor:not-allowed}
+input,select,textarea{background:#11131a;border:1px solid var(--line);border-radius:8px;color:var(--text);padding:9px;font:inherit;min-width:0}input:focus,select:focus,textarea:focus{outline:2px solid #8b5cf6;outline-offset:1px}
+#fileInput,#folderInput{display:none}.statrow{display:flex;gap:7px;flex-wrap:wrap;margin-left:auto}.stat{background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:7px 10px;color:var(--muted);font-size:11px}.stat strong{color:var(--text);font-size:14px;margin-right:4px}
+.layout{display:grid;grid-template-columns:minmax(210px,270px) minmax(0,1fr);gap:14px;min-height:65vh}.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden;min-width:0}.panelhead{padding:12px 14px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:8px}.panelhead h2{font-size:12px;text-transform:uppercase;letter-spacing:.09em;color:#c8c5dc;margin:0}
+.sidebody{padding:11px}.filter{width:100%;margin-bottom:9px}.filelist{display:flex;flex-direction:column;gap:4px;max-height:56vh;overflow:auto}.fileitem{text-align:left;justify-content:flex-start;width:100%;padding:9px;background:transparent;border-color:transparent;display:block}.fileitem.active{background:#30294a;border-color:#6651a4}.fileitem .fname{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600}.fileitem small{display:block;color:var(--muted);margin-top:3px}
+.content{display:flex;flex-direction:column}.badge{font-size:10px;color:#d4c8ff;background:#352a51;border:1px solid #59477f;padding:3px 7px;border-radius:99px;white-space:nowrap}.dropzone{border:1px dashed #5b5374;border-radius:10px;padding:11px;text-align:center;color:var(--muted);margin-bottom:13px}.dropzone.drag{background:#2b2540;border-color:var(--accent)}
+.empty{padding:34px 18px;text-align:center;color:var(--muted)}.empty strong{display:block;color:var(--text);font-size:16px;margin-bottom:7px}
+.filters{display:grid;grid-template-columns:minmax(180px,1fr) 170px 140px;gap:8px;padding:12px;border-bottom:1px solid var(--line)}.filters input{width:100%}
+.tablewrap{overflow:auto;max-height:57vh}table{border-collapse:collapse;width:100%;min-width:760px;font-size:12px}th{text-align:left;position:sticky;top:0;background:#20212b;color:#bdb9d4;padding:10px;border-bottom:1px solid var(--line);z-index:1}td{padding:8px 10px;border-bottom:1px solid #2b2e39;vertical-align:top}tr:hover td{background:#211f2c}tr.selected td{background:#30294a}td.key{font:11px ui-monospace,SFMono-Regular,Consolas,monospace;color:#c4b5fd;overflow-wrap:anywhere;width:27%}td.val{white-space:pre-wrap;overflow-wrap:anywhere;max-width:300px}td.custom{color:#d8d1f5;white-space:pre-wrap;overflow-wrap:anywhere;max-width:300px}td.actions{white-space:nowrap;width:74px}td.actions button{padding:5px 7px;font-size:11px}
+.pager{display:flex;gap:8px;align-items:center;justify-content:flex-end;padding:9px 12px;color:var(--muted);border-top:1px solid var(--line);font-size:12px}.editpanel{border-top:1px solid var(--line);padding:14px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.5fr);gap:12px}.editpanel h3{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:#c8c5dc;margin:0 0 8px}.editpanel label{display:block;color:var(--muted);font-size:11px;margin:8px 0 5px}.editpanel input,.editpanel textarea{width:100%}.editpanel textarea{min-height:95px;resize:vertical}.edit-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.hint{color:var(--muted);font-size:11px;margin-top:6px}.message{font-size:12px;color:var(--good);min-height:18px;margin-left:auto}.message.error{color:var(--bad)}.footer{margin-top:14px;color:var(--muted);font-size:12px}.hidden{display:none!important}
+@media(max-width:900px){.layout{grid-template-columns:1fr}.filelist{max-height:190px}.filters{grid-template-columns:1fr 1fr}.filters input{grid-column:1/-1}.tablewrap{max-height:48vh}.editpanel{grid-template-columns:1fr}.statrow{margin-left:0}}
+</style>
+</head>
+<body>
+<header><div class="brand"><div class="logo">T</div><div><h1>Deadlock Text Workshop</h1><p>Localization-aware editor · global search · safe TXT copies</p></div></div></header>
+<main>
+<div class="toolbar">
+<label class="filebutton primary" for="fileInput">＋ Import TXT files</label><input id="fileInput" type="file" accept=".txt,text/plain" multiple>
+<button id="folderBtn">＋ Import folder</button><input id="folderInput" type="file" webkitdirectory multiple>
+<button id="exportSelected" disabled>Export selected copy</button><button id="exportAll" disabled>Export all copies</button><button id="exportEdits" disabled>Export edited files only</button>
+<button id="removeFile" disabled>Remove file</button>
+<div class="statrow"><div class="stat"><strong id="fileCount">0</strong> files</div><div class="stat"><strong id="entryCount">0</strong> entries</div><div class="stat"><strong id="editedCount">0</strong> edits</div></div>
+</div>
+<div class="dropzone" id="dropzone">Drop localization <b>.txt</b> files here. Imports and edits stay in this browser until you export them.</div>
+<div class="layout">
+<section class="panel"><div class="panelhead"><h2>Imported files</h2><span class="badge" id="fileBadge">0 loaded</span></div><div class="sidebody"><input class="filter" id="fileFilter" placeholder="Filter filenames…"><div class="filelist" id="fileList"><div class="empty">Import TXT files to begin.</div></div></div></section>
+<section class="panel content">
+<div class="panelhead"><h2>Localization entries</h2><span class="badge" id="parseBadge">Waiting for files</span></div>
+<div id="emptyState" class="empty"><strong>Your text library starts here</strong>Import one or more localization TXT files. Parsed key/value entries will appear in a searchable table. Unrecognized lines, comments, and spacing are retained in the reconstructed output.</div>
+<div id="workspace" class="hidden">
+<div class="filters"><input id="entrySearch" placeholder="Search all imported files by key or text…"><select id="categoryFilter"><option value="all">All categories</option><option value="hero">Heroes / characters</option><option value="item">Items / upgrades</option><option value="ability">Abilities / effects</option><option value="ui">UI / general</option><option value="other">Other</option></select><select id="viewFilter"><option value="all">All entries</option><option value="edited">Edited only</option><option value="unchanged">Unchanged only</option></select></div>
+<div class="tablewrap"><table><thead><tr><th>Localization key</th><th>Original text</th><th>Custom text</th><th></th></tr></thead><tbody id="entryRows"></tbody></table><div class="empty hidden" id="noResults">No entries match those filters.</div></div>
+<div class="pager"><span id="pageInfo">0 entries</span><button id="prevPage">← Previous</button><button id="nextPage">Next →</button></div>
+<div class="editpanel">
+<div><h3>Selected entry</h3><label for="editKey">Internal key (read-only)</label><input id="editKey" readonly><label for="editOriginal">Original value</label><textarea id="editOriginal" readonly></textarea><div class="hint">The original imported text is never modified.</div></div>
+<div><h3>Custom replacement</h3><label for="editValue">Displayed text</label><textarea id="editValue" placeholder="Enter replacement text…"></textarea><div class="hint">Leave this identical to the original to keep the entry unchanged. Quotes and backslashes are escaped when exported.</div><div class="edit-actions"><button id="applyEntry" class="primary">Apply replacement</button><button id="revertEntry">Revert entry</button><button id="exportCurrentFile">Export this file</button><span class="message" id="message"></span></div></div>
+</div>
+<div class="notice" style="padding:10px 14px;border-top:1px solid var(--line);color:var(--muted);font-size:11px">Parser supports common single-line quoted key/value entries (including Valve-style localization files). Lines it cannot confidently parse remain untouched. Multi-line values and unusual escape rules may need a future parser upgrade.</div>
+</div></section>
+</div>
+<div class="footer">Local-first: no files are uploaded. Browser storage is not used for long-term backups in this version, so export your work before closing or refreshing. For cross-device access, publish this single HTML file on a static web host; imports still remain local to each browser.</div>
+</main>
+<script>
+(()=>{
+const $=id=>document.getElementById(id);
+let files=[],selectedFileId=null,selectedEntryId=null,nextFileId=1,nextEntryId=1,page=0,pageSize=100;
+const esc=s=>s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const unquote=s=>s.replace(/\\(["\\nrt])/g,(_,c)=>({'n':'\n','r':'\r','t':'\t'}[c]??c));
+const quote=s=>s.replace(/\\/g,'\\\\').replace(/"/g,'\\"').replace(/\r/g,'\\r').replace(/\n/g,'\\n').replace(/\t/g,'\\t');
+function classify(key,value,filename){
+const s=(key+' '+value+' '+filename).toLowerCase();
+if(/hero|character|citadel_gc_hero|hero_name|hero_desc|character_name/.test(s))return 'hero';
+if(/upgrade|item|shop|weapon|spirit|vitality|ability_item|active_item/.test(s))return 'item';
+if(/ability|skill|effect|status|buff|debuff|slow|stun|silence|burn|bleed|root|freeze/.test(s))return 'ability';
+if(/hud|ui_|menu|tooltip|subtitle|loading|button|settings|search|confirm|cancel|option|notification/.test(s))return 'ui';
+return 'other';
+}
+function parseFile(text){
+const lines=text.split(/(\r\n|\n|\r)/); // preserve each original newline token
+const parts=[];for(let i=0;i<lines.length;i+=2)parts.push({line:lines[i],newline:lines[i+1]||''});
+const entries=[];
+parts.forEach((p,idx)=>{
+const re=/^(\s*)"((?:\\.|[^"\\])*)"(\s+)"((?:\\.|[^"\\])*)"(.*)$/;
+const m=p.line.match(re);
+if(m){entries.push({id:nextEntryId++,partIndex:idx,keyRaw:m[2],key:unquote(m[2]),valueRaw:m[4],value:unquote(m[4]),originalValue:unquote(m[4]),prefix:m[1],between:m[3],suffix:m[5],category:'other'});}
+});
+return {parts,entries};
+}
+function reconstruct(f){
+const map=new Map(f.entries.map(e=>[e.partIndex,e]));
+return f.parts.map((p,i)=>{const e=map.get(i);if(!e)return p.line+p.newline;return e.prefix+'"'+e.keyRaw+'"'+e.between+'"'+quote(e.value)+'"'+e.suffix+p.newline;}).join('');
+}
+function currentFile(){return files.find(f=>f.id===selectedFileId)}
+function currentEntry(){const f=currentFile();return f&&f.entries.find(e=>e.id===selectedEntryId)}
+function editedEntries(){return files.flatMap(f=>f.entries.filter(e=>e.value!==e.originalValue))}
+function setMessage(s,error=false){$('message').textContent=s;$('message').className='message'+(error?' error':'')}
+function stats(){
+$('fileCount').textContent=files.length;$('fileBadge').textContent=files.length+' loaded';
+$('entryCount').textContent=files.reduce((n,f)=>n+f.entries.length,0).toLocaleString();
+$('editedCount').textContent=editedEntries().length.toLocaleString();
+$('exportAll').disabled=!files.length;$('exportEdits').disabled=!files.length;$('exportSelected').disabled=!currentFile();$('removeFile').disabled=!currentFile();
+$('parseBadge').textContent=files.length?files.reduce((n,f)=>n+f.entries.length,0).toLocaleString()+' entries parsed':'Waiting for files';
+}
+function renderFiles(){
+const term=$('fileFilter').value.toLowerCase(),list=$('fileList');list.innerHTML='';
+const filtered=files.filter(f=>f.name.toLowerCase().includes(term)||f.path.toLowerCase().includes(term));
+if(!filtered.length)list.innerHTML='<div class="empty">No matching files.</div>';
+filtered.forEach(f=>{const b=document.createElement('button');b.className='fileitem'+(f.id===selectedFileId?' active':'');b.innerHTML=`<span class="fname">${esc(f.name)}</span><small>${f.entries.length} entries${f.entries.some(e=>e.value!==e.originalValue)?' · edited':''}</small>`;b.onclick=()=>selectFile(f.id);list.appendChild(b)});
+stats();
+}
+function selectFile(id){
+selectedFileId=id;selectedEntryId=null;page=0;
+$('emptyState').classList.add('hidden');$('workspace').classList.remove('hidden');
+renderFiles();renderEntries();renderEditor();
+}
+function filteredEntries(){
+const q=$('entrySearch').value.toLowerCase(),cat=$('categoryFilter').value,view=$('viewFilter').value;
+return files.flatMap(f=>f.entries.map(e=>({...e,fileId:f.id,fileName:f.name,category:classify(e.key,e.value,f.name)}))).filter(e=>{
+const f=files.find(x=>x.id===e.fileId);const hay=(e.key+' '+e.value+' '+f.name+' '+f.path).toLowerCase();
+return (!q||hay.includes(q))&&(cat==='all'||e.category===cat)&&(view==='all'||(view==='edited'?e.value!==e.originalValue:e.value===e.originalValue));
+});
+}
+function renderEntries(){
+const all=filteredEntries(),tbody=$('entryRows');tbody.innerHTML='';
+const pages=Math.max(1,Math.ceil(all.length/pageSize));page=Math.min(page,pages-1);
+const slice=all.slice(page*pageSize,(page+1)*pageSize);
+slice.forEach(e=>{
+const tr=document.createElement('tr');if(e.id===selectedEntryId)tr.classList.add('selected');
+const f=files.find(x=>x.id===e.fileId);
+tr.innerHTML=`<td class="key">${esc(e.key)}<div style="color:#898ca0;margin-top:4px;font:10px system-ui">${esc(e.fileName)}</div></td><td class="val">${esc(e.originalValue)}</td><td class="custom">${esc(e.value)}${e.value!==e.originalValue?' <span class="badge">edited</span>':''}</td><td class="actions"><button type="button">Edit</button></td>`;
+tr.querySelector('button').onclick=()=>{selectedFileId=f.id;selectedEntryId=e.id;renderFiles();renderEntries();renderEditor();};
+tr.ondblclick=()=>{selectedFileId=f.id;selectedEntryId=e.id;renderFiles();renderEntries();renderEditor();};
+tbody.appendChild(tr);
+});
+$('noResults').classList.toggle('hidden',all.length>0);$('pageInfo').textContent=all.length?`${page*pageSize+1}–${Math.min((page+1)*pageSize,all.length)} of ${all.length}`:'0 entries';
+$('prevPage').disabled=page===0;$('nextPage').disabled=(page+1)>=pages;stats();
+}
+function renderEditor(){
+const e=currentEntry();$('editKey').value=e?e.key:'';$('editOriginal').value=e?e.originalValue:'';$('editValue').value=e?e.value:'';
+$('applyEntry').disabled=!e;$('revertEntry').disabled=!e;$('exportCurrentFile').disabled=!currentFile();
+}
+async function importFiles(fileList){
+const incoming=[...fileList].filter(f=>f.name.toLowerCase().endsWith('.txt')||f.type==='text/plain');
+for(const file of incoming){
+try{
+const text=await file.text(),parsed=parseFile(text),path=file.webkitRelativePath||file.name;
+let f=files.find(x=>x.path===path||x.name===file.name);
+if(f){f.originalText=text;f.parts=parsed.parts;f.entries=parsed.entries;f.currentText=text;}
+else{f={id:nextFileId++,name:file.name,path,originalText:text,currentText:text,parts:parsed.parts,entries:parsed.entries};files.push(f)}
+}catch(err){alert('Could not read '+file.name+': '+err.message)}
+}
+if(!selectedFileId&&files.length)selectedFileId=files[0].id;
+if(files.length)selectFile(selectedFileId);else renderFiles();
+}
+function download(name,text){
+const blob=new Blob([text],{type:'text/plain;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');
+a.href=url;a.download=name.replace(/[<>:"/\\|?*\x00-\x1F]/g,'_');document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);
+}
+function exportFile(f,suffix='_copy'){
+f.entries.forEach(e=>{});const output=reconstruct(f);
+download(f.name.replace(/\.txt$/i,'')+suffix+'.txt',output);
+}
+$('fileInput').onchange=e=>{importFiles(e.target.files);e.target.value=''};
+$('folderBtn').onclick=()=>$('folderInput').click();$('folderInput').onchange=e=>{importFiles(e.target.files);e.target.value=''};
+$('fileFilter').oninput=renderFiles;
+$('entrySearch').oninput=()=>{page=0;renderEntries()};
+$('categoryFilter').onchange=()=>{page=0;renderEntries()};$('viewFilter').onchange=()=>{page=0;renderEntries()};
+$('prevPage').onclick=()=>{page=Math.max(0,page-1);renderEntries()};$('nextPage').onclick=()=>{page++;renderEntries()};
+$('applyEntry').onclick=()=>{
+const e=currentEntry();if(!e)return;
+e.value=$('editValue').value;
+const f=currentFile();f.currentText=reconstruct(f);
+setMessage('Replacement applied to working copy.');renderEntries();renderFiles();renderEditor();
+};
+$('revertEntry').onclick=()=>{const e=currentEntry();if(!e)return;e.value=e.originalValue;$('editValue').value=e.value;const f=currentFile();f.currentText=reconstruct(f);setMessage('Entry reverted.');renderEntries();renderFiles();renderEditor()};
+$('exportCurrentFile').onclick=()=>{const f=currentFile();if(f)exportFile(f,'_edited')};
+$('exportSelected').onclick=()=>{const f=currentFile();if(f)exportFile(f,'_copy')};
+$('exportAll').onclick=async()=>{for(const f of files){exportFile(f,f.entries.some(e=>e.value!==e.originalValue)?'_edited':'_copy');await new Promise(r=>setTimeout(r,220))}};
+$('exportEdits').onclick=async()=>{const changed=files.filter(f=>f.entries.some(e=>e.value!==e.originalValue));if(!changed.length){alert('No edited entries to export yet.');return}for(const f of changed){exportFile(f,'_edited');await new Promise(r=>setTimeout(r,220))}};
+$('removeFile').onclick=()=>{const f=currentFile();if(!f)return;files=files.filter(x=>x.id!==f.id);selectedFileId=files.length?files[0].id:null;selectedEntryId=null;if(selectedFileId)selectFile(selectedFileId);else{$('workspace').classList.add('hidden');$('emptyState').classList.remove('hidden');renderFiles();stats()}};
+const dz=$('dropzone');dz.ondragover=e=>{e.preventDefault();dz.classList.add('drag')};dz.ondragleave=()=>dz.classList.remove('drag');dz.ondrop=e=>{e.preventDefault();dz.classList.remove('drag');importFiles(e.dataTransfer.files)};
+document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='f'&&!$('workspace').classList.contains('hidden')){e.preventDefault();$('entrySearch').focus()}});
+renderFiles();
+})();
+</script>
+</body>
+</html>
